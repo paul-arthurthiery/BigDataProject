@@ -5,7 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var consumptionRouter = require('./routes/consumption.route');
+var csvDumper = require('./scripts/csvDumper');
 
 var app = express();
 
@@ -20,7 +21,29 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('consumptionRouter')
+
+// Configuring the database
+const dbConfig = require('./config/database.config.js');
+const mongoose = require('mongoose');
+
+mongoose.Promise = global.Promise;
+
+// Connecting to the database
+mongoose.connect(dbConfig.url)
+.then(() => {
+    console.log("Successfully connected to the database");
+}).catch(err => {
+    console.log('Could not connect to the database. Exiting now...');
+    process.exit();
+});
+
+mongoose.connection.db.listCollections({name: 'consumption'})
+    .next(function(err, collinfo) {
+        if (!collinfo) {
+            csvDumper.dumpFolder('./csv');
+        }
+    });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
