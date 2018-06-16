@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var consumptionRouter = require('./routes/consumption.route');
+var siteRouter = require('./routes/site.route');
 var csvDumper = require('./scripts/csvDumper');
 
 var app = express();
@@ -21,7 +22,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('consumptionRouter')
+app.use('consumptionRouter');
+app.use('siteRouter');
 
 // Configuring the database
 const dbConfig = require('./config/database.config.js');

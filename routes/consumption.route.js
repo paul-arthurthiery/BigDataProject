@@ -3,19 +3,19 @@ var router = express.Router();
 
 const consumptions = require('../controllers/consumption.controller.js');
 
-// Create a new temperature
+// Create a new consumption
 router.post('/consumptions', consumptions.create);
 
 // Retrieve all consumptions
 router.get('/consumptions', consumptions.findAll);
 
-// Retrieve a single temperature with temperatureId
-router.get('/consumptions/:temperatureId', consumptions.findOne);
+// Retrieve a single consumption with consumptionId
+router.get('/consumptions/:consumptionId', consumptions.findOne);
 
-// Update a Temperature with temperatureId
-router.put('/consumptions/:temperatureId', consumptions.update);
+// Update a Temperature with consumptionId
+router.put('/consumptions/:consumptionId', consumptions.update);
 
-// Delete a Temperature with temperatureId
-router.delete('/consumptions/:temperatureId', consumptions.delete);
+// Delete a Temperature with consumptionId
+router.delete('/consumptions/:consumptionId', consumptions.delete);
 
 module.exports = router;
