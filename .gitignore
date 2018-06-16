@@ -59,3 +59,13 @@ typings/
 
 # next.js build output
 .next
+
+# csv folder
+csv
+
+#MAC stuff
+.DS_Store
+._.DS_Store
+
+#Alex's stuff
+desktop.ini
