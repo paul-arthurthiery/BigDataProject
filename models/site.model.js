@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-auto-increment');
 
 const SiteSchema = mongoose.Schema({
-  SITE_ID: Number,
-  INDUSTRY: String,
-  SUB_INDUSTRY: String,
-  SQ_FT: Number,
-  LAT: Number,
-  LNG: Number,
-  TIME_ZONE: String,
-  TIME_ZONE: String
+  siteId: Number,
+  industry: String,
+  sub_industry: String,
+  square_feet: Number,
+  latitude: Number,
+  longitude: Number,
+  timezone: String,
+  timezone_offset: String
 });
 
 autoIncrement.initialize(mongoose.connection);
