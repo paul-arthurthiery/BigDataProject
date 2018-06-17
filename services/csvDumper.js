@@ -1,10 +1,20 @@
 var fs = require('fs');
-const {exec} = require('child_process');
+var csv = require('fast-csv');
 var path = require('path');
 var async = require('async');
+var siteHeaders = [
+  "site_id",
+  "industry",
+  "sub_industry",
+  "square_feet",
+  "latitude",
+  "longitude",
+  "timezone",
+  "timezone_offset"
+];
+var consumptionHeaders = ["timestamp", "dttm_utc", "value", "estimated", "anomaly"];
 const consumptionModel = require('../models/consumption.model');
 const siteModel = require('../models/site.model');
-var db = require('../config/database.config');
 
 var csvDumper = function() {
 
@@ -12,28 +22,53 @@ var csvDumper = function() {
     let folderPath = path.resolve(__dirname, '../' + pathToFolder);
     var filenames = fs.readdirSync(folderPath);
     for (let file of filenames) {
-      this.dumpFile(file);
+      var insertedBatch = await this.dumpFile(folderPath + "/" + file);
+      console.log('done with file '+file)
     }
   }
 
-  this.dumpFile = function(fileName) {
-    if (fileName.includes('sites')) {
-      var collectionName = 'sites';
-    } else {
-      var collectionName = 'consumptions'
-    }
-    exec('cd csv && mongoimport --db ' + db.dbName + ' --collection ' + collectionName + ' --type csv --headerline --file ' + fileName , (err, stdout, stderr) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log(`stdout: ${stdout}`);
-      console.log(`stderr: ${stderr}`);
-    })
+  this.dumpFile = function(pathToFile) {
+    var stream = fs.createReadStream(pathToFile);
+    var batch = [];
+    if (pathToFile.includes('sites')) {
+      return new Promise((resolve, reject) => {
+        console.log(pathToFile);
 
-    console.log('imported '+fileName);
+        csv.fromStream(stream, {
+          headers: siteHeaders,
+          renameHeaders: true
+        }).on("data", (data) => {
+          batch.push(data);
+        }).on("end", async () => {
+            await siteModel.insertMany(batch).then(() => {
+               console.log("inserted "+pathToFile);
+               return resolve(batch);
+             }).catch((err) => {
+               return reject(err);
+             })
+        });
+      })
+
+    } else {
+      return new Promise((resolve, reject) => {
+        console.log(pathToFile);
+
+        csv.fromStream(stream, {
+          headers: consumptionHeaders,
+          renameHeaders: true
+        }).on("data", (data) => {
+          batch.push(data);
+        }).on("end", async () => {
+            await consumptionModel.insertMany(batch).then(() => {
+               console.log("inserted "+pathToFile);
+               return resolve(batch);
+             }).catch((err) => {
+               return reject(err);
+            })
+        });
+      })
+    }
   }
 }
-
 
 module.exports = csvDumper;
