@@ -59,7 +59,7 @@ mongoose.Promise = global.Promise;
 // Connecting to the database
 mongoose.connect(dbConfig.url).then(() => {
   console.log("Successfully connected to the database");
-  mongoose.connection.db.listCollections({name: 'consumption'}).next(function(err, collinfo) {
+  mongoose.connection.db.listCollections({name: 'consumptions'}).next(function(err, collinfo) {
     if (!collinfo) {
       var dump = new csvDumper();
       dump.dumpFolder('csv/');
