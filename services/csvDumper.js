@@ -56,12 +56,12 @@ var csvDumper = function() {
 
       return new Promise((resolve, reject) => {
         console.log(pathToFile);
-
+        let siteId = filename.slice(0, -4);
         csv.fromStream(stream, {
           headers: consumptionHeaders,
           renameHeaders: true
         }).on("data", (data) => {
-          data.site = [siteModel.findOne({"site_id": filename.slice(0, -4)})];
+          data.site = [{"siteId": siteId}];
           batch.push(data);
         }).on("end", async () => {
             await consumptionModel.insertMany(batch).then(() => {
